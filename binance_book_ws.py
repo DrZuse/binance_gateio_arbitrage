@@ -1,13 +1,12 @@
 import numpy as np
-import time
+#import time
 
 from binance.websocket.spot.websocket_client import SpotWebsocketClient as Client
 from configurations import basic_parameters, setup_logger
-from multiprocessing import Process
 from shared_dicts import SharedDict
 
 
-logger = setup_logger('spot_askbid_stream')
+logger = setup_logger('binance_book_ws')
 
 # =============================================================================
 #   Basic parameters

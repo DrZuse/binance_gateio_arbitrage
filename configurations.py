@@ -6,7 +6,7 @@ import os
 # =============================================================================
 basic_parameters = dict()
 basic_parameters['binance_ticker']                  = 'BTCUSDT'
-basic_parameters['gateio_ticker']                   = 'BTCUSD'
+basic_parameters['gateio_ticker']                   = 'BTC_USD'
 
 # =============================================================================
 # Logs
