@@ -24,7 +24,7 @@ shared_queue_dimensions     = basic_parameters['shared_queue_dimensions'] # (2, 
 def book_ticker_spot_stream():
 
     def message_handler(message):
-        logger.info(message)
+        #logger.info(message)
         if message.get('u') is None:
             return
             

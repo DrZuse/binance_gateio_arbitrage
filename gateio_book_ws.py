@@ -17,7 +17,7 @@ def book_ticker_stream(__name__ = '__main__'):
 
     # define your callback function on message received
     def print_message(conn: Connection, response: WebSocketResponse):
-        logger.info(response.result)
+        #logger.info(response.result)
         if response.error:
             logger.error('error returned: ', response.error)
             conn.close()
