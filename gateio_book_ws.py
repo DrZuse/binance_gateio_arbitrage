@@ -6,6 +6,8 @@ from configurations import basic_parameters, setup_logger
 
 logger = setup_logger('gateio_book_ws')
 
+ticker                  = basic_parameters['gateio_ticker']
+
 # define your callback function on message received
 def print_message(conn: Connection, response: WebSocketResponse):
     if response.error:
@@ -22,14 +24,14 @@ async def main():
 
     # subscribe to any channel you are interested into, with the callback function
     channel = FuturesBookTickerChannel(conn, print_message)
-    channel.subscribe(["BTC_USD"])
+    channel.subscribe(['BTC_USD'])
 
     # start the client
     await conn.run()
 
 
 if __name__ == '__main__':
-   #loop = asyncio.get_event_loop()
+   #loop = asyncio.get_event_loop() # old versions of python
    loop = asyncio.new_event_loop()
    loop.run_until_complete(main())
    loop.close()

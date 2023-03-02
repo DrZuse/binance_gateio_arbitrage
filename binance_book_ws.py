@@ -12,7 +12,7 @@ logger = setup_logger('binance_book_ws')
 #   Basic parameters
 # =============================================================================
 
-ticker                  = basic_parameters['ticker']
+ticker                  = basic_parameters['binance_ticker']
 
 
 # =======================================================================================
@@ -23,7 +23,7 @@ queue = np.zeros((2, 6), dtype=np.float32) # LOB |lowest ASK|lowest ASK size|hig
 def book_ticker_spot_stream():
 
     def message_handler(message):
-        #print(message)
+        print(message)
         if message.get('u') is None:
             return
             
