@@ -7,6 +7,7 @@ import os
 basic_parameters = dict()
 basic_parameters['binance_ticker']                  = 'BTCUSDT'
 basic_parameters['gateio_ticker']                   = 'BTC_USD'
+basic_parameters['shared_queue_dimensions']         = (2,3)
 
 # =============================================================================
 # Logs

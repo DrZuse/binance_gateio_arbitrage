@@ -3,7 +3,7 @@ import numpy as np
 
 from binance.websocket.spot.websocket_client import SpotWebsocketClient as Client
 from configurations import basic_parameters, setup_logger
-from shared_dicts import SharedDict
+from shared_dicts import SharedArray
 
 
 logger = setup_logger('binance_book_ws')
@@ -34,6 +34,14 @@ def book_ticker_spot_stream():
 
         queue[:-1] = queue[1:]
         queue[-1] = asks_bids
+
+        # in each new process create a new numpy array using:
+        arr = np.frombuffer(SharedArray.ws_arr.get_obj()) # ws_arr and arr share the same memory
+
+        
+        # make it two-dimensional
+        b = arr.reshape((n,m)) # b and arr share the same memory
+        
         #print(queue)
         if asks_bids[4] == 1 and asks_bids[5] == 1 and SharedDict.orders['sell_order_status'] is None:
             logger.info('todo')
