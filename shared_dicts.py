@@ -1,8 +1,9 @@
 from multiprocessing import Manager, Array
 
 import ctypes as c
-import numpy as np
+#import numpy as np
 import multiprocessing as mp
+from configurations import basic_parameters as bp
 
 ######################################################
 # Создаем словари доступные из всех потоков
@@ -22,9 +23,7 @@ class SharedDict:
 
 
 class SharedArray:
-    # ws
-    n, m = 2, 3
-    ws_arr = mp.Array(c.c_double, n*m)
+    ws_arr = mp.Array(c.c_double, bp['shared_queue_dimensions'][0]*bp['shared_queue_dimensions'][1])
     
 
 '''
