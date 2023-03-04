@@ -5,11 +5,10 @@ import asyncio
 
 from gate_ws import Configuration, Connection, WebSocketResponse
 from gate_ws.futures import FuturesOrderChannel, FuturesUserTradesChannel, FuturesPositionClosesChannel, FuturesPositionsChannel, FuturesAutoOrdersChannel
-from gate_ws.spot import SpotPublicTradeChannel, SpotOrderChannel
 from configurations import basic_parameters, setup_logger
 
 logger = setup_logger('user_stream')
-ticker                       = basic_parameters['gateio_ticker']
+ticker = basic_parameters['gateio_ticker']
 
 
 async def main():
