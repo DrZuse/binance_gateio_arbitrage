@@ -12,11 +12,15 @@ logger = setup_logger('user_stream')
 ticker = basic_parameters['gateio_ticker']
 
 def message_handler(r):
-    print(r.result)
+    logger.info(r.result)
+    #logger.info(f'type of result: {type(r.result)}')
     #logger.info(f"result: {r.result[0]['reduce_only']}")
-    if type(r.result) == 'list' and r.result[0]['is_reduce_only']: # TODO: change type detection with something more specific
-        logger.info('set oco_filled to TRUE')
-        SharedDict.orders['oco_filled'] = True
+    try:
+        if r.result[0]['is_reduce_only']:
+            logger.info('set oco_filled to TRUE')
+            SharedDict.orders['oco_filled'] = True
+    except:
+        pass
 
 
 def user_stream(__name__ = '__main__'):
