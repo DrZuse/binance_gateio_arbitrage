@@ -34,12 +34,12 @@ while True:
         if current_deviation != deviations_array[-1]:
             deviations_array[:-1] = deviations_array[1:]
             deviations_array[-1] = current_deviation
-            logger.info(deviations_array)
-            logger.info(deviations_array[-1])
+            #logger.info(deviations_array)
+            logger.info(f'current_deviation: {deviations_array[-1]}')
             logger.info(queue)
             if deviations_array[0] > 0:
                 quantile05 = np.quantile(deviations_array, 0.5) # 0.5 quantile of normal distribution
-                logger.info(quantile05)
+                logger.info(f'0.5 quantile of normal distribution: {quantile05}')
                 if (current_deviation - quantile05) >= 0.01 and SharedDict.orders['oco_filled']:
                     SharedDict.orders['oco_filled'] = False
                     logger.info('---------BUY----------')
