@@ -11,42 +11,36 @@ ticker = basic_parameters['gateio_ticker']
 settle = 'btc'
 
 
+def try_to_send_order(initial, trigger):
+    logger.info(trigger)
+    price_triggered_order = FuturesPriceTriggeredOrder(
+        initial = initial,
+        trigger = trigger,
+        order_type = 'close-long-position')
+    try:
+        resp = futures_api.create_price_triggered_order(settle, price_triggered_order)
+        logger.info(resp) # ID
+    except GateApiException as ex:
+        logger.error("error encountered creating futures order: %s", ex)
+
+
 def tpsl(order_response):
+    filled_price = float(order_response.fill_price)
+    deviation = 0.01
+    if order_response.size > 0: # positive number means LONG position
+        initial = {'contract': ticker, 'size': 0, 'price': '0', 'tif': 'ioc', 'auto_size' : 'close_long', 'reduce_only': True}
 
-    if order_response.size:
-        if order_response.size > 0: # LONG position
-            filled_price = float(order_response.fill_price)
-            # take profit
-            initial = {'contract': ticker, 'size': 0, 'price': '0', 'tif': 'ioc', 'auto_size' : 'close_long', 'reduce_only': True}
-            trigger = {'strategy_type': 0, 'price_type': 0, 'price': str(filled_price + 10), 'rule': 1}
+        # take profit
+        price = str(round(filled_price + (filled_price/100) * deviation, 1))
+        trigger = {'strategy_type': 0, 'price_type': 0, 'price': price, 'rule': 1} 
+        try_to_send_order(initial, trigger)
 
-            logger.info(initial)
-            logger.info(trigger)
-            price_triggered_order = FuturesPriceTriggeredOrder(
-                initial = initial,
-                trigger = trigger,
-                order_type = 'close-long-position')
-            try:
-                resp = futures_api.create_price_triggered_order(settle, price_triggered_order)
-                logger.info(resp)
-            except GateApiException as ex:
-                logger.error("error encountered creating futures order: %s", ex)
+        # stop loss
+        price = str(round(filled_price - (filled_price/100) * deviation, 1))
+        trigger = {'strategy_type': 0, 'price_type': 0, 'price': price, 'rule': 2} 
+        try_to_send_order(initial, trigger)
 
-            # stop loss
-            initial = {'contract': ticker, 'size': 0, 'price': '0', 'tif': 'ioc', 'auto_size' : 'close_long', 'reduce_only': True}
-            trigger = {'strategy_type': 0, 'price_type': 0, 'price': str(filled_price - 10), 'rule': 2}
 
-            logger.info(initial)
-            logger.info(trigger)
-            price_triggered_order = FuturesPriceTriggeredOrder(
-                initial = initial,
-                trigger = trigger,
-                order_type = 'close-long-position')
-            try:
-                resp = futures_api.create_price_triggered_order(settle, price_triggered_order)
-                logger.info(resp)
-            except GateApiException as ex:
-                logger.error("error encountered creating futures order: %s", ex)
 
 
 # Initialize API client
@@ -60,7 +54,6 @@ order = FuturesOrder(contract=ticker, size=1, price='0', tif='ioc') # negative s
 try:
     order_response = futures_api.create_futures_order(settle, order)
     logger.info(order_response)
-    logger.info(type(order_response))
     tpsl(order_response)
 except GateApiException as ex:
     logger.error("error encountered creating futures order: %s", ex)
