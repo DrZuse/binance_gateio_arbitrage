@@ -9,6 +9,10 @@ logger = setup_logger('gateio_orders')
 
 ticker = basic_parameters['gateio_ticker']
 settle = 'btc'
+# Initialize API client
+# Setting host is optional. It defaults to https://api.gateio.ws/api/v4
+config = Configuration(key=api.gateio_api_key, secret=api.gateio_api_secret)
+futures_api = FuturesApi(ApiClient(config))
 
 
 def try_to_send_order(initial, trigger):
@@ -28,7 +32,7 @@ def tpsl(order_response):
     filled_price = float(order_response.fill_price)
     deviation = 0.01
     if order_response.size > 0: # positive number means LONG position
-        initial = {'contract': ticker, 'size': 0, 'price': '0', 'tif': 'ioc', 'auto_size' : 'close_long', 'reduce_only': True}
+        initial = {'contract': ticker, 'size': 0, 'price': '0', 'tif': 'ioc', 'auto_size': 'close_long', 'reduce_only': True}
 
         # take profit
         price = str(round(filled_price + (filled_price/100) * deviation, 1))
@@ -42,21 +46,17 @@ def tpsl(order_response):
 
 
 
+def order():
+    logger.info('start order')
+    # order using market price
 
-# Initialize API client
-# Setting host is optional. It defaults to https://api.gateio.ws/api/v4
-config = Configuration(key=api.gateio_api_key, secret=api.gateio_api_secret)
-futures_api = FuturesApi(ApiClient(config))
-                            
-# order using market price
-
-order = FuturesOrder(contract=ticker, size=1, price='0', tif='ioc') # negative size to SHORT
-try:
-    order_response = futures_api.create_futures_order(settle, order)
-    logger.info(order_response)
-    tpsl(order_response)
-except GateApiException as ex:
-    logger.error("error encountered creating futures order: %s", ex)
+    order = FuturesOrder(contract=ticker, size=1, price='0', tif='ioc') # negative size to SHORT
+    try:
+        order_response = futures_api.create_futures_order(settle, order)
+        logger.info(order_response)
+        tpsl(order_response)
+    except GateApiException as ex:
+        logger.error("error encountered creating futures order: %s", ex)
 
 
 ''' OK

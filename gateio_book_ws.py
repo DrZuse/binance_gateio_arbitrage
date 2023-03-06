@@ -14,6 +14,7 @@ sqd                          = basic_parameters['shared_queue_dimensions']
 
 
 def book_ticker_stream(__name__ = '__main__'):
+    logger.info('start listen gateio book_ticker websocket')
 
     # define your callback function on message received
     def print_message(conn: Connection, response: WebSocketResponse):
