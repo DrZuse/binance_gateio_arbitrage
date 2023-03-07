@@ -30,8 +30,9 @@ while True:
     if queue[1, 2] > queue[0, 2] and queue[1, 2] > queue[1, 4]: 
         curr_binance_bid = queue[1, 2]
         curr_gateio_ask = queue[1, 4]
+        
         current_deviation = (curr_binance_bid - curr_gateio_ask) * 100 / curr_binance_bid
-        if current_deviation != deviations_array[-1]:
+        if current_deviation != deviations_array[-1] and current_deviation != 100:
             deviations_array[:-1] = deviations_array[1:]
             deviations_array[-1] = current_deviation
             if current_deviation >= 0.1 and SharedDict.orders['oco_filled']:
