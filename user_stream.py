@@ -4,6 +4,7 @@ import asyncio
 
 
 from gate_ws import Configuration, Connection
+from gate_api.exceptions import GateApiException
 from gate_ws.futures import FuturesOrderChannel
 from configurations import basic_parameters, setup_logger
 from shared_dicts import SharedDict
@@ -19,8 +20,9 @@ def message_handler(r):
         if r.result[0]['is_reduce_only']:
             logger.info('set oco_filled to TRUE')
             SharedDict.orders['oco_filled'] = True
-    except:
-        pass
+    except GateApiException as e:
+        logger.error(e)
+        
 
 
 def user_stream(__name__ = '__main__'):

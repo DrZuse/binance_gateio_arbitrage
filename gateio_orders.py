@@ -1,9 +1,12 @@
+
 import api
+import time
 
 from configurations import setup_logger, basic_parameters
 
 from gate_api import ApiClient, Configuration, FuturesApi, FuturesOrder, FuturesPriceTriggeredOrder, BatchFuturesOrder
 from gate_api.exceptions import GateApiException
+
 
 logger = setup_logger('gateio_orders')
 
@@ -30,17 +33,18 @@ def try_to_send_order(initial, trigger):
 
 def tpsl(order_response):
     filled_price = float(order_response.fill_price)
-    deviation = 0.01
+    tp_deviation = 0.1
+    sl_deviation = 0.03
     if order_response.size > 0: # positive number means LONG position
         initial = {'contract': ticker, 'size': 0, 'price': '0', 'tif': 'ioc', 'auto_size': 'close_long', 'reduce_only': True}
 
         # take profit
-        price = str(round(filled_price + (filled_price/100) * deviation, 1))
+        price = str(round(filled_price + (filled_price/100) * tp_deviation, 1))
         trigger = {'strategy_type': 0, 'price_type': 0, 'price': price, 'rule': 1} 
         try_to_send_order(initial, trigger)
 
         # stop loss
-        price = str(round(filled_price - (filled_price/100) * deviation, 1))
+        price = str(round(filled_price - (filled_price/100) * sl_deviation, 1))
         trigger = {'strategy_type': 0, 'price_type': 0, 'price': price, 'rule': 2} 
         try_to_send_order(initial, trigger)
 
@@ -50,10 +54,11 @@ def order():
     logger.info('start order')
     # order using market price
 
-    order = FuturesOrder(contract=ticker, size=1, price='0', tif='ioc') # negative size to SHORT
+    order = FuturesOrder(contract=ticker, size=10, price='0', tif='ioc') # negative size to SHORT
     try:
         order_response = futures_api.create_futures_order(settle, order)
         logger.info(order_response)
+        time.sleep(2) # to give some time to execute order. Prevent error {"label":"AUTO_USER_NO_LONG_POSITION","message":"user not have long position"}
         tpsl(order_response)
     except GateApiException as ex:
         logger.error("error encountered creating futures order: %s", ex)
