@@ -22,6 +22,7 @@ shared_queue_dimensions     = basic_parameters['shared_queue_dimensions'] # (2, 
 #queue = np.zeros((2, 4), dtype=np.float32) # LOB |lowest ASK|lowest ASK size|highest BID|highest BID size|
 
 def book_ticker_spot_stream():
+    logger.info('start listen binance book_ticker websocket')
 
     def message_handler(message):
         #logger.info(message)
