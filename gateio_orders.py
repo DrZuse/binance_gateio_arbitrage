@@ -58,7 +58,7 @@ def order():
     try:
         order_response = futures_api.create_futures_order(settle, order)
         logger.info(order_response)
-        time.sleep(2) # to give some time to execute order. Prevent error {"label":"AUTO_USER_NO_LONG_POSITION","message":"user not have long position"}
+        time.sleep(0.5) # to give some time to execute order. Prevent error {"label":"AUTO_USER_NO_LONG_POSITION","message":"user not have long position"}
         tpsl(order_response)
     except GateApiException as ex:
         logger.error("error encountered creating futures order: %s", ex)

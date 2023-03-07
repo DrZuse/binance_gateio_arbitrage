@@ -7,8 +7,6 @@ from user_stream import user_stream
 import binance_book_ws
 import gateio_book_ws
 import numpy as np
-import pandas as pd
-import time
 
 sqd = basic_parameters['shared_queue_dimensions']
 logger = setup_logger('main')
