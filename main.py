@@ -27,12 +27,13 @@ while True:
     queue = np.frombuffer(SharedArray.ws_arr.get_obj()).reshape(sqd) # ws_arr and arr share the same memory
     # current binance bid > previous binance bid
     # current binance bid > current gateio ask
-    if queue[1, 2] > queue[0, 2] and queue[1, 2] > queue[1, 4]: 
+    # current gateio ask > 0
+    if queue[1, 2] > queue[0, 2] and queue[1, 2] > queue[1, 4] and queue[1, 4] > 0: 
         curr_binance_bid = queue[1, 2]
         curr_gateio_ask = queue[1, 4]
         
         current_deviation = (curr_binance_bid - curr_gateio_ask) * 100 / curr_binance_bid
-        if current_deviation != deviations_array[-1] and current_deviation != 100:
+        if current_deviation != deviations_array[-1]:
             deviations_array[:-1] = deviations_array[1:]
             deviations_array[-1] = current_deviation
             if current_deviation >= 0.1 and SharedDict.orders['oco_filled']:
