@@ -7,6 +7,7 @@ from user_stream import user_stream
 import binance_book_ws
 import gateio_book_ws
 import numpy as np
+import pandas as pd
 import time
 
 sqd = basic_parameters['shared_queue_dimensions']
@@ -22,6 +23,7 @@ Process(target=binance_book_ws.book_ticker_spot_stream).start()
 Process(target=user_stream).start()
 
 deviations_array = np.zeros(100, dtype=np.float64)
+binance_bid_prices_array = np.zeros(100, dtype=np.float64)
 
 while True:
     queue = np.frombuffer(SharedArray.ws_arr.get_obj()).reshape(sqd) # ws_arr and arr share the same memory
@@ -32,14 +34,20 @@ while True:
         curr_binance_bid = queue[1, 2]
         curr_gateio_ask = queue[1, 4]
         
+        binance_bid_prices_array[:-1] = binance_bid_prices_array[1:]
+        binance_bid_prices_array[-1] = curr_binance_bid
+
+
         current_deviation = (curr_binance_bid - curr_gateio_ask) * 100 / curr_binance_bid
         if current_deviation != deviations_array[-1]:
             deviations_array[:-1] = deviations_array[1:]
             deviations_array[-1] = current_deviation
-            if current_deviation >= 0.1 and SharedDict.orders['oco_filled']:
+
+            binance_bid_prices_quantile05 = np.quantile(binance_bid_prices_array, 0.5) # 0.5 quantile of normal distribution
+            if current_deviation >= 0.1 and SharedDict.orders['oco_filled'] and curr_binance_bid > binance_bid_prices_quantile05:
                 SharedDict.orders['oco_filled'] = False
                 logger.info('---------BUY----------')
-                logger.info(f'current_deviation: {current_deviation}')
+                logger.info(f'current_deviation: {current_deviation} | curr_binance_bid {curr_binance_bid} | binance_bid_prices_quantile05 {binance_bid_prices_quantile05}')
                 logger.info(queue)
                 Process(target=order).start()
 
